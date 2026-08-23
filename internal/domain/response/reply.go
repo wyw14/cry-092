@@ -33,7 +33,10 @@ func NewReply(id, proposalID, actorID string, round int, kind Kind, summary stri
 	if round < 1 || summary == "" || len(files) == 0 {
 		return nil, shared.NewError("REPLY_INVALID", "reply kind, summary and file are required", nil)
 	}
-	return &Reply{ID: id, ProposalID: proposalID, Round: round, Kind: kind, Summary: summary, FileIDs: files, SubmittedBy: actorID, SubmittedAt: now.UTC(), Version: 1}, nil
+	// 复制成答复自有的切片，断开与调用方入参的底层共享，确保答复证据在提交后不可被外部改动替换。
+	ids := make([]string, len(files))
+	copy(ids, files)
+	return &Reply{ID: id, ProposalID: proposalID, Round: round, Kind: kind, Summary: summary, FileIDs: ids, SubmittedBy: actorID, SubmittedAt: now.UTC(), Version: 1}, nil
 }
 
 func validKind(k Kind) bool {
@@ -41,6 +44,10 @@ func validKind(k Kind) bool {
 }
 
 func (r *Reply) MarkViewed(now time.Time) bool {
+	if r.ViewedAt != nil {
+		// 首次查收记录一经写入即不可变，代表再次打开页面不得覆盖该时间。
+		return false
+	}
 	at := now.UTC()
 	r.ViewedAt = &at
 	r.Version++
@@ -71,13 +78,23 @@ func (r Reply) ForRepresentative() RepresentativeCopy {
 	if r.ViewedAt != nil {
 		status = "viewed"
 	}
+	// 正式答复文件清单是答复证据，向代表视图下发时同样要复制独立切片，避免调用方再改动代表看到的清单。
 	return RepresentativeCopy{
 		ReplyID:     r.ID,
 		Status:      status,
 		Kind:        r.Kind,
 		Summary:     r.Summary,
-		FileIDs:     r.FileIDs,
+		FileIDs:     copyStrings(r.FileIDs),
 		ViewedAt:    r.ViewedAt,
-		Supplements: r.Supplements,
+		Supplements: copyStrings(r.Supplements),
 	}
+}
+
+func copyStrings(in []string) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, len(in))
+	copy(out, in)
+	return out
 }

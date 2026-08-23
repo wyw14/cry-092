@@ -77,7 +77,8 @@ func prepareReplyInput(kind domain.Kind, summary string, files []string) (domain
 	if kind == "" {
 		kind = domain.KindExplained
 	}
-	kept := files[:0]
+	// 不复用入参切片底层空间（files[:0] 会改写调用方原数组），结果构建到独立切片，保证调用方附件数组在提交后不被就地修改。
+	kept := make([]string, 0, len(files))
 	for _, fileID := range files {
 		if fileID != "" {
 			kept = append(kept, fileID)
