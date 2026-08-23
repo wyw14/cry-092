@@ -47,12 +47,11 @@ func (a *Assignment) Reassign(unitID, actorID, reason string, now time.Time) err
 }
 
 func (a *Assignment) Accept(unitID, actorID string, now time.Time) error {
-	if a.Status != StatusAssigned {
+	if a.Status != StatusAssigned || unitID != a.UnitID {
 		return shared.NewError("ASSIGNMENT_NOT_ACCEPTABLE", "assignment is not available to this unit", shared.ErrForbidden)
 	}
 	at := now.UTC()
 	a.Status = StatusAccepted
-	a.UnitID = unitID
 	a.AcceptedBy = actorID
 	a.AcceptedAt = &at
 	a.Version++
@@ -60,7 +59,7 @@ func (a *Assignment) Accept(unitID, actorID string, now time.Time) error {
 }
 
 func (a Assignment) CanHandle(unitID string) bool {
-	return a.Status == StatusAccepted
+	return a.Status == StatusAccepted && unitID == a.UnitID
 }
 
 type AcceptanceReceipt struct {
