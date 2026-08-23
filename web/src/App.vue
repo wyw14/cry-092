@@ -1,0 +1,2 @@
+<template><el-container><el-aside width="220px"><div class="brand">代表建议平台</div><el-menu router default-active="/"><el-menu-item index="/">办理工作台</el-menu-item><el-menu-item index="/archives">档案与排名</el-menu-item></el-menu></el-aside><el-main><router-view /></el-main></el-container></template>
+<style>.el-container{min-height:100vh}.el-aside{border-right:1px solid #e5e7eb;background:#fff}.brand{height:64px;display:flex;align-items:center;padding:0 20px;font-weight:700;color:#1f2937}.el-main{padding:0;background:#f6f7f9}</style>
