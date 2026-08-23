@@ -1,0 +1,13 @@
+StableError:
+  type: object
+  required: [code, message, field_errors, request_id]
+  properties:
+    code: { type: string, example: PROPOSAL_STATE_INVALID }
+    message: { type: string }
+    field_errors:
+      type: array
+      items:
+        type: object
+        required: [field, message]
+        properties: { field: { type: string }, message: { type: string } }
+    request_id: { type: string }
