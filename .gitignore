@@ -1,0 +1,12 @@
+.env
+bin/
+coverage/
+var/
+*.out
+*.test
+web/node_modules/
+web/dist/
+web/*.tsbuildinfo
+.idea/
+.vscode/
+.DS_Store
