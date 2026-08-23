@@ -1,0 +1,35 @@
+AssignSuggestion:
+  parameters: [ { $ref: ../openapi.yaml#/components/parameters/SuggestionID } ]
+  post:
+    tags: [handling]
+    operationId: assignSuggestionByCategory
+    summary: 按分类优先级自动分办
+    responses:
+      '201': { description: 分办结果 }
+      '409': { $ref: ../responses.yaml#/StableFailure }
+AcceptSuggestion:
+  parameters: [ { $ref: ../openapi.yaml#/components/parameters/SuggestionID } ]
+  post:
+    tags: [handling]
+    operationId: acceptSuggestionForUnit
+    summary: 由目标承办单位签收
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [unit_id]
+            properties: { unit_id: { type: string } }
+    responses:
+      '204': { description: 已签收 }
+      '403': { $ref: ../responses.yaml#/StableFailure }
+CreateHandlingPlan:
+  parameters: [ { $ref: ../openapi.yaml#/components/parameters/SuggestionID } ]
+  post:
+    tags: [handling]
+    operationId: createThirtyWorkdayPlan
+    summary: 为已签收建议创建办理计划
+    responses:
+      '201': { description: 含统一工作日期限的计划 }
+      '409': { $ref: ../responses.yaml#/StableFailure }

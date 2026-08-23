@@ -1,0 +1,5 @@
+StableFailure:
+  description: 含请求关联信息的稳定错误
+  content:
+    application/json:
+      schema: { $ref: ./schemas/common.yaml#/StableError }
