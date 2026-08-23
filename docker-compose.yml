@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: cry092
+      POSTGRES_USER: cry092
+      POSTGRES_PASSWORD: cry092
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cry092 -d cry092"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [suggestion-backplane]
+    restart: unless-stopped
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://cry092:cry092@postgres:5432/cry092?sslmode=disable
+      JWT_SIGNING_KEY: local-compose-signing-key-change-me-123456
+      FILE_STORAGE_ROOT: /app/var/files
+      APP_TIMEZONE: Asia/Shanghai
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - app_files:/app/var/files
+    networks: [suggestion-backplane]
+    stop_grace_period: 20s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  postgres_data:
+  app_files:
+networks:
+  suggestion-backplane:
+    driver: bridge
