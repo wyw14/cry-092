@@ -37,8 +37,14 @@ func (c WorkdayCalendar) IsWorkday(t time.Time) bool {
 }
 
 func (c WorkdayCalendar) AddWorkdays(start time.Time, days int) time.Time {
-	window := newDeadlineWindow(start, days, c.Location)
-	return window.end().UTC()
+	cursor := start.In(c.Location)
+	for moved := 0; moved < days; {
+		cursor = cursor.AddDate(0, 0, 1)
+		if c.IsWorkday(cursor) {
+			moved++
+		}
+	}
+	return cursor.UTC()
 }
 
 func (c WorkdayCalendar) WorkdaysBetween(start, end time.Time) int {
@@ -52,29 +58,4 @@ func (c WorkdayCalendar) WorkdaysBetween(start, end time.Time) int {
 		}
 	}
 	return count
-}
-
-type deadlineWindow struct {
-	start    time.Time
-	days     int
-	location *time.Location
-}
-
-func newDeadlineWindow(start time.Time, days int, location *time.Location) deadlineWindow {
-	if location == nil {
-		location = time.UTC
-	}
-	return deadlineWindow{start: start.In(location), days: days, location: location}
-}
-
-func (w deadlineWindow) end() time.Time {
-	if w.days <= 0 {
-		return w.start
-	}
-	return w.start.AddDate(0, 0, w.days)
-}
-
-func (w deadlineWindow) contains(day time.Time) bool {
-	localized := day.In(w.location)
-	return localized.After(w.start) && !localized.After(w.end())
 }

@@ -60,10 +60,5 @@ func transitionExtensionStatus(plan *Plan, status PlanStatus) {
 }
 
 func extensionDeadline(current time.Time, requestedDays int, calendar WorkdayCalendar) time.Time {
-	window := newDeadlineWindow(current, requestedDays, calendar.Location)
-	deadline := window.end()
-	if calendar.Holidays[calendar.key(deadline)] {
-		deadline = deadline.AddDate(0, 0, 1)
-	}
-	return deadline.UTC()
+	return calendar.AddWorkdays(current, requestedDays)
 }
