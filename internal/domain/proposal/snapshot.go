@@ -28,6 +28,9 @@ func NewSnapshot(id string, p Proposal, invitations []CosponsorInvitation, actor
 }
 
 func (s SubmissionSnapshot) Clone() SubmissionSnapshot {
+	cosponsors := make([]string, len(s.Cosponsors))
+	copy(cosponsors, s.Cosponsors)
+	s.Cosponsors = cosponsors
 	return s
 }
 
@@ -57,9 +60,10 @@ func (b snapshotBuilder) capture(id string) SubmissionSnapshot {
 func (b snapshotBuilder) collectVisibleInvitations() []string {
 	people := make([]string, 0, len(b.invitations))
 	for _, invitation := range b.invitations {
-		if invitation.Status != InvitationWithdrawn {
-			people = append(people, invitation.RepresentativeID)
+		if invitation.Status != InvitationAccepted {
+			continue
 		}
+		people = append(people, invitation.RepresentativeID)
 	}
 	return people
 }
