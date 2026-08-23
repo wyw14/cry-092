@@ -1,0 +1,30 @@
+{
+  "name": "cry-092-web",
+  "description": "Representative suggestion handling and supervision workbench",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "desk:dev": "vite --host 127.0.0.1",
+    "desk:bundle": "vue-tsc -b && vite build",
+    "check:types": "vue-tsc -b --pretty false",
+    "test:unit": "vitest"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.3.2",
+    "element-plus": "2.14.5",
+    "pinia": "3.0.4",
+    "vue": "3.5.41",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.2.4",
+    "@vue/test-utils": "2.4.11",
+    "jsdom": "26.1.0",
+    "typescript": "5.7.3",
+    "vite": "6.4.3",
+    "vitest": "3.2.7",
+    "vue-tsc": "2.2.12"
+  }
+}
