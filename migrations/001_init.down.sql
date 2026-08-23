@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS archive_records, unit_rankings, outbox_messages, audit_events, reminders, supervision_cases, rework_rounds, evaluations, replies, extension_requests, handling_plans, assignments, assignment_rules, proposal_snapshots, cosponsor_invitations, proposals, refresh_tokens, users CASCADE;
