@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: 代表建议办理与督办平台 API
+  version: 1.0.0
+  description: 建议提交快照、分办签收、限期办理、答复评价和督办归档的本地 API。
+servers:
+  - url: http://localhost:8080/api/v1
+tags:
+  - { name: suggestions, description: 建议与联名快照 }
+  - { name: handling, description: 分办签收与限期办理 }
+  - { name: evaluation, description: 答复评价与重办 }
+paths:
+  /proposals:
+    $ref: ./paths/suggestions.yaml#/ProposalCollection
+  /proposals/{id}/submit:
+    $ref: ./paths/suggestions.yaml#/SubmitSuggestion
+  /proposals/{id}/assign:
+    $ref: ./paths/handling.yaml#/AssignSuggestion
+  /proposals/{id}/accept:
+    $ref: ./paths/handling.yaml#/AcceptSuggestion
+  /proposals/{id}/plans:
+    $ref: ./paths/handling.yaml#/CreateHandlingPlan
+  /proposals/{id}/replies:
+    $ref: ./paths/evaluation.yaml#/SubmitReply
+  /proposals/{id}/evaluations:
+    $ref: ./paths/evaluation.yaml#/EvaluateReply
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    StableError:
+      $ref: ./schemas/common.yaml#/StableError
+    SuggestionSnapshot:
+      type: object
+      required: [id, proposal_id, title, cause, body, category, cosponsors, submitted_by, submitted_at]
+      properties:
+        id: { type: string }
+        proposal_id: { type: string }
+        title: { type: string }
+        cause: { type: string }
+        body: { type: string }
+        category: { type: string }
+        cosponsors: { type: array, maxItems: 20, items: { type: string } }
+        submitted_by: { type: string }
+        submitted_at: { type: string, format: date-time }
+  parameters:
+    SuggestionID:
+      name: id
+      in: path
+      required: true
+      description: 建议业务标识
+      schema: { type: string, minLength: 1 }
+security:
+  - accessToken: []

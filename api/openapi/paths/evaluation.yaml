@@ -1,0 +1,29 @@
+SubmitReply:
+  parameters: [ { $ref: ../openapi.yaml#/components/parameters/SuggestionID } ]
+  post:
+    tags: [evaluation]
+    operationId: submitFormalReply
+    summary: 提交四类正式答复及文件
+    responses:
+      '201': { description: 独立保存的答复轮次 }
+      '403': { $ref: ../responses.yaml#/StableFailure }
+EvaluateReply:
+  parameters: [ { $ref: ../openapi.yaml#/components/parameters/SuggestionID } ]
+  post:
+    tags: [evaluation]
+    operationId: evaluateAndMaybeRework
+    summary: 评价答复；不满意时原子创建重办与督办
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [reply_id, rating]
+            properties:
+              reply_id: { type: string }
+              rating: { type: string, enum: [satisfied, mostly_satisfied, unsatisfied] }
+              comment: { type: string }
+    responses:
+      '201': { description: 评价及其事务副作用 }
+      '409': { $ref: ../responses.yaml#/StableFailure }
