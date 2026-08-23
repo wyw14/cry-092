@@ -1,0 +1,31 @@
+ProposalCollection:
+  get:
+    tags: [suggestions]
+    operationId: listSuggestions
+    summary: 按办理视角分页查询建议
+    parameters:
+      - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+      - { name: page_size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      - { name: cursor, in: query, schema: { type: string } }
+      - { name: sort, in: query, schema: { type: string, enum: [submitted_at, title, status, due_at] } }
+      - { name: direction, in: query, schema: { type: string, enum: [asc, desc] } }
+      - { name: status, in: query, schema: { type: string } }
+      - { name: category, in: query, schema: { type: string } }
+      - { name: unit_id, in: query, schema: { type: string } }
+    responses:
+      '200': { description: 建议办理分页 }
+      '400': { $ref: ../responses.yaml#/StableFailure }
+SubmitSuggestion:
+  parameters:
+    - $ref: ../openapi.yaml#/components/parameters/SuggestionID
+  post:
+    tags: [suggestions]
+    operationId: submitSuggestionSnapshot
+    summary: 提交并冻结正文与已同意联名人
+    responses:
+      '201':
+        description: 不可变提交快照
+        content:
+          application/json:
+            schema: { $ref: ../openapi.yaml#/components/schemas/SuggestionSnapshot }
+      '409': { $ref: ../responses.yaml#/StableFailure }
