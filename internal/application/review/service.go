@@ -30,9 +30,6 @@ func (s Service) Evaluate(ctx context.Context, proposalID, replyID, representati
 	if err != nil {
 		return nil, fmt.Errorf("prepare evaluation: %w", err)
 	}
-	if err := s.Reviews.SaveEvaluation(ctx, evaluation); err != nil {
-		return nil, fmt.Errorf("save evaluation: %w", err)
-	}
 	err = s.Tx.WithinTransaction(ctx, func(txCtx context.Context) error {
 		p, err := s.Proposals.Get(txCtx, proposalID)
 		if err != nil {
@@ -47,6 +44,14 @@ func (s Service) Evaluate(ctx context.Context, proposalID, replyID, representati
 		}
 		if reply.ProposalID != proposalID {
 			return shared.ErrConflict
+		}
+		// Persist the evaluation inside the transaction so it commits or rolls
+		// back atomically with the rework round, supervision case, outbox event
+		// and audit record. Writing it outside the transaction left a dangling
+		// evaluation whenever a later step failed, which also let a retry
+		// create a duplicate evaluation.
+		if err := s.Reviews.SaveEvaluation(txCtx, evaluation); err != nil {
+			return err
 		}
 		version := p.Version
 		if err := p.Advance(proposal.StatusAnswered, proposal.StatusEvaluated, s.Clock.Now()); err != nil {
